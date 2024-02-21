@@ -1,43 +1,51 @@
-require('./models/db')
+require("./models/db");
 
-// Importing required modules
 const express = require("express");
 const path = require("path");
-const exphbs = require('express-handlebars');
-const bodyparser = require('body-parser');
-
-// Importing controllers
+const handlebars = require("handlebars");
+const exphbs = require("express-handlebars");
+const { allowInsecurePrototypeAccess } = require("@handlebars/allow-prototype-access");
+const bodyparser = require("body-parser");
 const studentController = require("./controllers/studentController");
 
-// Initializing Express app
 const app = express();
 
-// Configuring middleware
-app.use(bodyparser.urlencoded({extended:false}));
+// Middleware
+app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json());
 
-// Setting up routes
-app.get('/', (req, res) => {
+// View engine setup
+app.set("views", path.join(__dirname, "views"));
+const exphbsInstance = exphbs.create({
+    handlebars: allowInsecurePrototypeAccess(handlebars),
+    extname: "hbs",
+    defaultLayout: "mainLayout",
+    layoutsDir: path.join(__dirname, "views/layouts")
+});
+app.engine("hbs", exphbsInstance.engine);
+app.set("view engine", "hbs");
+
+// Routes
+app.get("/", (req, res) => {
     res.send(`
-        <h2>Welcome To Students Database</h2>
+        <h2>Welcome to Students Database!!</h2>
         <h3>Click here to get access to the <b><a href="/student/list">Database</a></b></h3>
     `);
 });
 
-// Setting up view engine
-app.set('views', path.join(__dirname, '/views/'));
-app.engine('hbs', exphbs.engine({
-    extname: 'hbs',
-    defaultLayout: 'MainLayout',
-    layoutsDir: path.join(__dirname, '/views/layouts')
-}));
-app.set('view engine', 'hbs');
+app.use("/student", studentController);
 
-// Starting the server
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server started at port ${PORT}`);
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send("Something went wrong!");
 });
 
-// Using studentController for '/student' routes
-app.use('/student', studentController);
+// Serve static files (optional)
+app.use(express.static(path.join(__dirname, "public")));
+
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Express server started at port: ${PORT}`);
+});

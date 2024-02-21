@@ -6,20 +6,21 @@
             <th>Email</th>
             <th>Mobile</th>
             <th>City</th>
+            <th>Actions</th> <!-- Added a header for actions -->
         </tr>
     </thead>
     <tbody>
-        {{ #each list }}
+        {{#each list}}
         <tr>
             <td>{{this.fullName}}</td>
             <td>{{this.email}}</td>
             <td>{{this.mobile}}</td>
             <td>{{this.city}}</td>
             <td>
-                <a href="/student/{{ this.id }}" class="btn btn-primary btn-sm">Edit</a>
-                <a href="/student/delete/{{ this.id }}" class="btn btn-danger btn-sm" onclick="return confirm('Are You Sure Want To Delete This Record?')">Delete</a>
+                <a href="/student/{{this.id}}" class="btn btn-primary btn-sm">Edit</a>
+                <a href="/student/delete/{{this.id}}" class="btn btn-danger btn-sm" onclick="return confirm('Are You Sure Want To Delete This Record?')">Delete</a>
             </td>
         </tr>
-        {{ /each }}
+        {{/each}}
     </tbody>
 </table>

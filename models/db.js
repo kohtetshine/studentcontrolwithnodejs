@@ -1,26 +1,22 @@
 const mongoose = require('mongoose');
 
-// MongoDB connection string
-const mongoURI = 'mongodb://localhost:27017/StudentDB';
-
-// Connect to MongoDB
-mongoose.connect(mongoURI);
-
-// Connection event handlers
-mongoose.connection.on('connected', () => {
-  console.log('MongoDB connected');
+mongoose.connect('mongodb://0.0.0.0:27017/StudentDB', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
 });
 
-mongoose.connection.on('error', (err) => {
-  console.error('MongoDB connection error:', err);
+const db = mongoose.connection;
+
+db.on('error', (err) => {
+    console.error('MongoDB connection error:', err);
 });
 
-mongoose.connection.on('disconnected', () => {
-  console.log('MongoDB disconnected');
+db.once('open', () => {
+    console.log('MongoDB connected');
 });
 
-// Load models
-require('./student.model');
+db.on('disconnected', () => {
+    console.log('MongoDB disconnected');
+});
 
-// Export the Mongoose object
-module.exports = mongoose;
+module.exports = db;
